@@ -1,4 +1,6 @@
-	select 	gti.GenTreeId AS GT, 
+	select
+		gt.GenTreeNumber AS GTN,
+		gti.GenTreeId AS GTID,
 		gti.IndividualId AS II, 
 		gti.BirthDate As BD, 
 		gti.BirthPlace AS BP, 
