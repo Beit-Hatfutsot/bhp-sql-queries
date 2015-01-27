@@ -1,23 +1,35 @@
-/*
-by baruch o.
-Get Personality data
-where
-p0 en
-p1 He
-*/
+WITH   EngPersonalitiesData as (
+select * from PersonalitiesData where LanguageCode = 0
+),
+HebPersonalitiesData as (
+select * from PersonalitiesData where LanguageCode =1
+),
+    EngPersonTypesData as (
+select * from PersonTypesData where LanguageCode = 0
+)
 select
-  p1.PersonalityId  as Lcode,
-  p0.Title as TitleEn,
-  p1.Title as TitleHe,
-  p0.FirstName as FirstNameEn,
-  p1.FirstName as FirstNameHE,
-  p0.LastName  as LastNameEn,
-  p1.LastName as LastNameHE,
-  p0.MiddleName as MiddleNameEn,
-  p0.NickName as NickNameEn,
-  p0.OtherNames as OtherNamesEn,
-  p1.MiddleName as MiddleNameHe,
-  p1.NickName as NickNameHe,
-  p1.OtherNames as OtherNamesHe
-from PersonalitiesData p1,PersonalitiesData p0
-where p0.PersonalityId=p1.PersonalityId and p0.LanguageCode=0 and p1.LanguageCode=1;
+  HebPersonalitiesData.PersonalityId  as PID,
+  EngPersonalitiesData.Title as EnTitle,
+  HebPersonalitiesData.Title as HeTitle,
+  EngPersonalitiesData.FirstName as EnFirstName,
+  HebPersonalitiesData.FirstName as HeFirstName,
+  EngPersonalitiesData.LastName  as EnLastName,
+  HebPersonalitiesData.LastName as HeLastName,
+  EngPersonalitiesData.MiddleName as EnMiddleName,
+  EngPersonalitiesData.NickName as EnNickName,
+  EngPersonalitiesData.OtherNames as EnOtherNames,
+  HebPersonalitiesData.MiddleName as HeMiddleName,
+  HebPersonalitiesData.NickName as HeNickName,
+  HebPersonalitiesData.OtherNames as HeOtherNames,
+  /*PersonTypeDesc*/
+  Ptypes.PersonTypeCode,
+  EngPtypeData.PersonTypeDesc as EnPtype,
+  HebPtypeData.PersonTypeDesc as HbPtype,
+  STUFF(( SELECT ',' + cast(UnitPersonalities.UnitId as nvarchar(max)) FROM UnitPersonalities  where Personalities.PersonalityId = UnitPersonalities.PersonalityId order by UnitPersonalities.PersonalityId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') UnitID
+from Personalities
+ -- left JOIN  UnitPersonalities on (Personalities.PersonalityId = UnitPersonalities.PersonalityId)
+  left join PersonalitiesPersonTypes Ptypes on (Personalities.PersonalityId = Ptypes.PersonalityId)
+  left join PersonTypesData EngPtypeData on (Ptypes.PersonTypeCode = EngPtypeData.PersonTypeCode and EngPtypeData.LanguageCode=0)
+  left join PersonTypesData HebPtypeData on (Ptypes.PersonTypeCode = HebPtypeData.PersonTypeCode and HebPtypeData.LanguageCode=1)
+  Left JOIN EngPersonalitiesData on (Personalities.PersonalityId = EngPersonalitiesData.PersonalityId )
+  Left JOIN HebPersonalitiesData on (Personalities.PersonalityId = HebPersonalitiesData.PersonalityId);
