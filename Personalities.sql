@@ -37,7 +37,6 @@ select
   STUFF(( SELECT  cast(UnitPersonalities.UnitId as nvarchar(max))+ ','FROM UnitPersonalities,Units  where Personalities.PersonalityId = UnitPersonalities.PersonalityId  and Units.UnitId = UnitPersonalities.UnitId and (Units.UnitType=11) order by UnitPersonalities.PersonalityId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') CreatorID,
   STUFF(( SELECT  cast(UnitPersonalities.UnitId as nvarchar(max))+ ','FROM UnitPersonalities,Units  where Personalities.PersonalityId = UnitPersonalities.PersonalityId  and Units.UnitId = UnitPersonalities.UnitId and (Units.UnitType=12) order by UnitPersonalities.PersonalityId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') GlobalID
 from Personalities
- -- left JOIN  UnitPersonalities on (Personalities.PersonalityId = UnitPersonalities.PersonalityId)
   left join PersonalitiesPersonTypes Ptypes on (Personalities.PersonalityId = Ptypes.PersonalityId)
   left join PersonTypesData EngPtypeData on (Ptypes.PersonTypeCode = EngPtypeData.PersonTypeCode and EngPtypeData.LanguageCode=0)
   left join PersonTypesData HebPtypeData on (Ptypes.PersonTypeCode = HebPtypeData.PersonTypeCode and HebPtypeData.LanguageCode=1)
