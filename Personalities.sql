@@ -25,11 +25,12 @@ select
   Ptypes.PersonTypeCode,
   EngPtypeData.PersonTypeDesc as EnPtype,
   HebPtypeData.PersonTypeDesc as HbPtype,
-  STUFF(( SELECT ',' + cast(UnitPersonalities.UnitId as nvarchar(max)) FROM UnitPersonalities  where Personalities.PersonalityId = UnitPersonalities.PersonalityId order by UnitPersonalities.PersonalityId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') UnitID
+  STUFF(( SELECT  cast(UnitPersonalities.UnitId as nvarchar(max))+ ','  FROM UnitPersonalities,Units  where Personalities.PersonalityId = UnitPersonalities.PersonalityId  and Units.UnitId = UnitPersonalities.UnitId and (Units.UnitType=0 or Units.UnitType=1) order by UnitPersonalities.PersonalityId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PicUnitID,
+  STUFF(( SELECT  cast(UnitPersonalities.UnitId as nvarchar(max))+ ','FROM UnitPersonalities,Units  where Personalities.PersonalityId = UnitPersonalities.PersonalityId  and Units.UnitId = UnitPersonalities.UnitId and (Units.UnitType=2 or Units.UnitType=3) order by UnitPersonalities.PersonalityId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') MusicUnitID
 from Personalities
  -- left JOIN  UnitPersonalities on (Personalities.PersonalityId = UnitPersonalities.PersonalityId)
   left join PersonalitiesPersonTypes Ptypes on (Personalities.PersonalityId = Ptypes.PersonalityId)
   left join PersonTypesData EngPtypeData on (Ptypes.PersonTypeCode = EngPtypeData.PersonTypeCode and EngPtypeData.LanguageCode=0)
   left join PersonTypesData HebPtypeData on (Ptypes.PersonTypeCode = HebPtypeData.PersonTypeCode and HebPtypeData.LanguageCode=1)
   Left JOIN EngPersonalitiesData on (Personalities.PersonalityId = EngPersonalitiesData.PersonalityId )
-  Left JOIN HebPersonalitiesData on (Personalities.PersonalityId = HebPersonalitiesData.PersonalityId);
+  Left JOIN HebPersonalitiesData on (Personalities.PersonalityId = HebPersonalitiesData.PersonalityId)
