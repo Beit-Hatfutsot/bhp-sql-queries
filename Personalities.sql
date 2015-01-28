@@ -24,8 +24,8 @@ select
   /*PersonTypeDesc*/
   Ptypes.PersonTypeCode,
   EngPtypeData.PersonTypeDesc as EnPtype,
-  HebPtypeData.PersonTypeDesc as HbPtype,
-  STUFF(( SELECT  cast(UnitPersonalities.UnitId as nvarchar(max))+ ','FROM UnitPersonalities,Units  where Personalities.PersonalityId = UnitPersonalities.PersonalityId  and Units.UnitId = UnitPersonalities.UnitId and (Units.UnitType=1) order by UnitPersonalities.PersonalityId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PicID,
+  HebPtypeData.PersonTypeDesc as HePtype,
+  STUFF(( SELECT  cast(UnitPreviewPics.PictureId as nvarchar(max))+ ','FROM UnitPersonalities,Units,UnitPreviewPics  where UnitPreviewPics.UnitId = Units.UnitId and Personalities.PersonalityId = UnitPersonalities.PersonalityId  and Units.UnitId = UnitPersonalities.UnitId and (Units.UnitType=1) order by UnitPersonalities.PersonalityId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PicID,
   STUFF(( SELECT  cast(UnitPersonalities.UnitId as nvarchar(max))+ ','FROM UnitPersonalities,Units  where Personalities.PersonalityId = UnitPersonalities.PersonalityId  and Units.UnitId = UnitPersonalities.UnitId and (Units.UnitType=2) order by UnitPersonalities.PersonalityId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') MusicID,
   STUFF(( SELECT  cast(UnitPersonalities.UnitId as nvarchar(max))+ ','FROM UnitPersonalities,Units  where Personalities.PersonalityId = UnitPersonalities.PersonalityId  and Units.UnitId = UnitPersonalities.UnitId and (Units.UnitType=3) order by UnitPersonalities.PersonalityId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') MusicTextID,
   STUFF(( SELECT  cast(UnitPersonalities.UnitId as nvarchar(max))+ ','FROM UnitPersonalities,Units  where Personalities.PersonalityId = UnitPersonalities.PersonalityId  and Units.UnitId = UnitPersonalities.UnitId and (Units.UnitType=5) order by UnitPersonalities.PersonalityId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PlaceID,
