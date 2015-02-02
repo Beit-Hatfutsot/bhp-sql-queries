@@ -1,0 +1,1 @@
+SELECT cast(PictureId as varchar(max)) as PictureId, PicturePath, PictureFileName FROM Pictures
