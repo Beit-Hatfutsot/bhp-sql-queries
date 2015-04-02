@@ -194,8 +194,7 @@ with unitFileAttac as
 			FileAttachments.AttachmentNum, 
 			FileAttachments.AttachmentPath
 FROM 		FileAttachments,
-			UnitFileAttachments,
-			Units u
+			UnitFileAttachments
 WHERE  		FileAttachments.AttachmentNum = UnitFileAttachments.AttachmentNum)
 SELECT   	u.UnitId 				as UnitId,
 			u.EditorRemarks 		as EditorRemarks, 
@@ -334,7 +333,7 @@ LEFT JOIN GenTreeReportStatus gtrs on gtrs.GenTreeId=gt.GenTreeId;
 -----------------------
 with unitFileAttac as
 (SELECT UnitFileAttachments.unitid, FileAttachments.AttachmentFileName, FileAttachments.AttachmentNum, FileAttachments.AttachmentPath
-FROM 		FileAttachments,UnitFileAttachments
+FROM 	FileAttachments,UnitFileAttachments
 WHERE  	FileAttachments.AttachmentNum = UnitFileAttachments.AttachmentNum),
  v as
 (SELECT   	u.UnitId,u.EditorRemarks, u.ForPreview, u.IsValueUnit,u.OldUnitId,
