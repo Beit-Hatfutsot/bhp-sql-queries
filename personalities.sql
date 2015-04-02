@@ -14,25 +14,25 @@ WHERE  	FileAttachments.AttachmentNum = UnitFileAttachments.AttachmentNum),
 			u.UpdateDate, u.UpdateUser,
 			heb.Bibiliography HeBibiliography, eng.Bibiliography EnBibiliography,
 			heb.id,heb.LocationInMuseum,
-			eng.UnitHeader EnHeader,
+			eng.UnitHeader EnHeader, 
 			heb.UnitHeader HeHeader ,
 			heb.UnitHeaderDMSoundex HeUnitHeaderDMSoundex, eng.UnitHeaderDMSoundex EnUnitHeaderDMSoundex,
-			heb.UnitText1 HeUnitText1,
+			heb.UnitText1 HeUnitText1, 
 			heb.UnitText2 HeUnitText2,
-			eng.UnitText1 EnUnitText1,
+			eng.UnitText1 EnUnitText1, 
 			eng.UnitText2 EnUnitText2,
-			STUFF(( SELECT ',' + cast(ul.LexiconId as varchar(max)) FROM dbo.UnitsLexicon ul where ul.UnitId=u.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') UserLexicon,
-			STUFF(( SELECT ',' + cast(ufl.AttachmentFileName as nvarchar(max)) FROM unitFileAttac ufl where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentFileName,
-			STUFF(( SELECT ',' + cast(ufl.AttachmentPath as nvarchar(max)) FROM unitFileAttac ufl where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentPath,
-			STUFF(( SELECT ',' + cast(ufl.AttachmentNum as nvarchar(max)) FROM unitFileAttac ufl where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentNum
---dbo.PlaceTypesData.PlaceTypeDesc,dbo.Places.PlaceTypeCode,
+			STUFF(( SELECT cast(ul.LexiconId as varchar(max)) FROM dbo.UnitsLexicon ul where ul.UnitId=u.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') UserLexicon,
+			STUFF(( SELECT cast(ufl.AttachmentFileName as nvarchar(max)) FROM unitFileAttac ufl where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentFileName,
+			STUFF(( SELECT cast(ufl.AttachmentPath as nvarchar(max)) FROM unitFileAttac ufl where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentPath,
+			STUFF(( SELECT cast(ufl.AttachmentNum as nvarchar(max)) FROM unitFileAttac ufl where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentNum
+--dbo.PlaceTypesData.PlaceTypeDesc,dbo.Places.PlaceTypeCode, 
 FROM        dbo.Units u
 LEFT JOIN	dbo.UnitData heb ON u.UnitId = heb.UnitId and heb.LanguageCode=1
 LEFT JOIN	dbo.UnitData eng ON u.UnitId = eng.UnitId and eng.LanguageCode=0
 LEFT JOIN 	dbo.RightsTypes ON u.RightsCode = dbo.RightsTypes.RightsCode
 LEFT JOIN 	dbo.UnitDisplayStatus ON u.UnitDisplayStatus = dbo.UnitDisplayStatus.DisplayStatus
 LEFT JOIN 	dbo.UnitStatuses ON u.UnitStatus = dbo.UnitStatuses.UnitStatus
-LEFT JOIN 	dbo.UnitTypes ON u.UnitType = dbo.UnitTypes.UnitType
+LEFT JOIN 	dbo.UnitTypes ON u.UnitType = dbo.UnitTypes.UnitType 
 WHERE     	u.UnitType =8)
 SELECT   v.*,
 		STUFF(( SELECT cast(ppt.PersonTypeCode as varchar(max)) + ',' FROM dbo.PersonalitiesPersonTypes ppt where ppt.PersonalityId=v.UnitId order by PersonTypeId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PersonTypeCodes,
@@ -42,9 +42,13 @@ SELECT   v.*,
 		STUFF(( SELECT cast(ppt.IsMainCreatorType as varchar(max)) + ',' FROM dbo.PersonalitiesPersonTypes ppt where ppt.PersonalityId=v.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') IsMainCreatorType,
 		--UnitSources
 		STUFF(( SELECT cast(us.SourceId as varchar(max)) + ',' FROM dbo.UnitSources us where us.UnitId=v.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PictureSources,
-		--UnitPreviewPics
-		STUFF(( SELECT cast(dbo.PicturesUnitPics.PictureId as varchar(max)) + ',' FROM dbo.UnitPreviewPics upp JOIN dbo.PicturesUnitPics ON upp.PictureId = dbo.PicturesUnitPics.PictureId AND upp.UnitId <> dbo.PicturesUnitPics.PictureUnitId and upp.UnitId =v.UnitId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PictureId,
+        --UnitPreviewPics
+		STUFF(( SELECT cast(dbo.PicturesUnitPics.PictureUnitId as varchar(max)) + ',' FROM dbo.UnitPreviewPics upp JOIN dbo.PicturesUnitPics ON upp.PictureId = dbo.PicturesUnitPics.PictureId AND upp.UnitId <> dbo.PicturesUnitPics.PictureUnitId and upp.UnitId =v.UnitId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PictureUnitsIds,
+		STUFF(( SELECT cast(upp.PictureId as varchar(max)) + ',' FROM dbo.UnitPreviewPics upp where upp.UnitId=v.UnitId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PictureId,
 		STUFF(( SELECT cast(upp.IsPreview as varchar(1)) + ',' FROM dbo.UnitPreviewPics upp where upp.UnitId=v.UnitId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') IsPreview,
+		-- + Pictures Files Details
+		STUFF(( SELECT ',' + isnull(cast(P.PicturePath as varchar(max)),'') + ',' FROM dbo.UnitPreviewPics upp left join Pictures P on P.PictureId=upp.PictureId where upp.UnitId=v.UnitId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PrevPicturePaths,
+		STUFF(( SELECT ',' + isnull(cast(P.PictureFileName as varchar(max)),'') + ',' FROM dbo.UnitPreviewPics upp left join Pictures P on P.PictureId=upp.PictureId where upp.UnitId=v.UnitId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PrevPictureFileNames,
 		-- UnitPlaces
 		STUFF(( SELECT cast(upp.PlaceId as varchar(max)) + ',' FROM dbo.UnitPlaces upp where upp.UnitId=v.UnitId order by upp.PlaceId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PlaceIds,
 		STUFF(( SELECT cast(upp.PlaceDescriptionTypeCode as varchar(max)) + ',' FROM dbo.UnitPlaces upp where upp.UnitId=v.UnitId order by upp.PlaceId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PlaceTypeCodes,
@@ -64,10 +68,10 @@ SELECT   v.*,
 		STUFF(( SELECT cast(pu.PeriodEndDate as varchar(max)) + ',' FROM dbo.UnitPeriods pu where pu.UnitId=v.UnitId order by pu.PeriodNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PeriodEndDate,
 		STUFF(( SELECT cast(pu.PeriodDesc as nvarchar(max)) + ',' FROM dbo.UnitPeriodsData pu where pu.UnitId=v.UnitId and pu.LanguageCode=1 order by pu.PeriodNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') HePeriodDesc,
 		STUFF(( SELECT cast(pu.PeriodDesc as nvarchar(max)) + ',' FROM dbo.UnitPeriodsData pu where pu.UnitId=v.UnitId and pu.LanguageCode=0 order by pu.PeriodNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') EnPeriodDesc
-		,per.PersonalityId,
-		HeData.FirstName HeFirstName, HeData.LastName HeLastName, HeData.MiddleName HeMiddleName, HeData.NickName HeNickName, HeData.OtherNames HeOtherNames,HeData.Title HeTitle,
+		,per.PersonalityId, 
+		HeData.FirstName HeFirstName, HeData.LastName HeLastName, HeData.MiddleName HeMiddleName, HeData.NickName HeNickName, HeData.OtherNames HeOtherNames,HeData.Title HeTitle, 
 		EnData.FirstName AS Expr1, EnData.LastName AS Expr2, EnData.MiddleName, EnData.NickName, EnData.OtherNames,EnData.Title
-FROM v
+FROM v        
 JOIN dbo.Personalities AS per on v.UnitId=per.PersonalityId
-LEFT JOIN dbo.PersonalitiesData AS HeData ON v.UnitId = HeData.PersonalityId AND HeData.LanguageCode = 0
-LEFT JOIN dbo.PersonalitiesData AS EnData ON v.UnitId = EnData.PersonalityId AND EnData.LanguageCode = 1;
+LEFT JOIN dbo.PersonalitiesData AS HeData ON v.UnitId = HeData.PersonalityId AND HeData.LanguageCode = 0 
+LEFT JOIN dbo.PersonalitiesData AS EnData ON v.UnitId = EnData.PersonalityId AND EnData.LanguageCode = 1
