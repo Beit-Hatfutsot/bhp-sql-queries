@@ -6,8 +6,8 @@ with unitFileAttac as
 			FileAttachments.AttachmentFileName, 
 			FileAttachments.AttachmentNum, 
 			FileAttachments.AttachmentPath
-FROM 		FileAttachments,
-			UnitFileAttachments
+FROM 		FileAttachments with (nolock),
+			UnitFileAttachments with (nolock)
 WHERE  		FileAttachments.AttachmentNum = UnitFileAttachments.AttachmentNum)
 SELECT   	u.UnitId 				as UnitId,
 			u.EditorRemarks 		as EditorRemarks, 

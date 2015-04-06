@@ -4,7 +4,8 @@
 
 with unitFileAttac as
 (SELECT UnitFileAttachments.unitid, FileAttachments.AttachmentFileName, FileAttachments.AttachmentNum, FileAttachments.AttachmentPath
-FROM 		FileAttachments,UnitFileAttachments
+FROM 	FileAttachments with (nolock),
+		UnitFileAttachments with (nolock)
 WHERE  	FileAttachments.AttachmentNum = UnitFileAttachments.AttachmentNum),
  v as
 (SELECT   	u.UnitId					as UnitId,
@@ -35,23 +36,23 @@ WHERE  	FileAttachments.AttachmentNum = UnitFileAttachments.AttachmentNum),
 			heb.UnitText2 				as HeUnitText2,
 			eng.UnitText1 				as EnUnitText1,
 			eng.UnitText2 				as EnUnitText2,
-			STUFF(( SELECT cast(ul.LexiconId as varchar(max)) + ',' FROM dbo.UnitsLexicon ul where ul.UnitId=u.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') UserLexicon,
-			STUFF(( SELECT cast(ufl.AttachmentFileName as nvarchar(max)) + ',' FROM unitFileAttac ufl where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentFileName,
-			STUFF(( SELECT cast(ufl.AttachmentPath as nvarchar(max)) + ',' FROM unitFileAttac ufl where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentPath,
-			STUFF(( SELECT cast(ufl.AttachmentNum as nvarchar(max)) + ',' FROM unitFileAttac ufl where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentNum
-FROM        dbo.Units u
-LEFT JOIN	dbo.UnitData heb ON u.UnitId = heb.UnitId and heb.LanguageCode=1
-LEFT JOIN	dbo.UnitData eng ON u.UnitId = eng.UnitId and eng.LanguageCode=0
-LEFT JOIN dbo.RightsTypes rt ON u.RightsCode = rt.RightsCode
-LEFT JOIN dbo.UnitDisplayStatus uds ON u.UnitDisplayStatus = uds.DisplayStatus
-LEFT JOIN dbo.UnitStatuses us ON u.UnitStatus = us.UnitStatus
-LEFT JOIN dbo.UnitTypes ut ON u.UnitType = ut.UnitType
+			STUFF(( SELECT cast(ul.LexiconId as varchar(max)) + ',' FROM dbo.UnitsLexicon ul with (nolock) where ul.UnitId=u.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') UserLexicon,
+			STUFF(( SELECT cast(ufl.AttachmentFileName as nvarchar(max)) + ',' FROM unitFileAttac ufl with (nolock) where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentFileName,
+			STUFF(( SELECT cast(ufl.AttachmentPath as nvarchar(max)) + ',' FROM unitFileAttac ufl with (nolock) where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentPath,
+			STUFF(( SELECT cast(ufl.AttachmentNum as nvarchar(max)) + ',' FROM unitFileAttac ufl with (nolock) where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentNum
+FROM        dbo.Units u with (nolock)
+LEFT JOIN	dbo.UnitData heb with (nolock) ON u.UnitId = heb.UnitId and heb.LanguageCode=1
+LEFT JOIN	dbo.UnitData eng with (nolock) ON u.UnitId = eng.UnitId and eng.LanguageCode=0
+LEFT JOIN dbo.RightsTypes rt with (nolock) ON u.RightsCode = rt.RightsCode
+LEFT JOIN dbo.UnitDisplayStatus uds with (nolock) ON u.UnitDisplayStatus = uds.DisplayStatus
+LEFT JOIN dbo.UnitStatuses us with (nolock) ON u.UnitStatus = us.UnitStatus
+LEFT JOIN dbo.UnitTypes ut with (nolock) ON u.UnitType = ut.UnitType
 WHERE     u.UnitType = 4) -- 10376
 select gt.GenTreeNumber, gt.GenTreeFileId,gt.GenTreePath ,
 		gt.GenTreeFileName, gt.GenTreeXmlPath,
 		gtrs.LastUpdate,gtrs.AttemptCount,
-		STUFF(( SELECT cast(us.SourceId as varchar(max)) + ',' FROM dbo.UnitSources us where us.UnitId=v.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,''),
+		STUFF(( SELECT cast(us.SourceId as varchar(max)) + ',' FROM dbo.UnitSources us with (nolock) where us.UnitId=v.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,''),
 		v.* 
-FROM v
-JOIN dbo.GenTree gt on  gt.GenTreeId=v.UnitId
-LEFT JOIN GenTreeReportStatus gtrs on gtrs.GenTreeId=gt.GenTreeId;
+FROM v with (nolock)
+JOIN dbo.GenTree gt with (nolock) on  gt.GenTreeId=v.UnitId
+LEFT JOIN GenTreeReportStatus gtrs with (nolock) on gtrs.GenTreeId=gt.GenTreeId;

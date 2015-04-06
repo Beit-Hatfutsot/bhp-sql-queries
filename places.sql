@@ -6,7 +6,7 @@ with unitFileAttac as
 			FileAttachments.AttachmentFileName, 
 			FileAttachments.AttachmentNum, 
 			FileAttachments.AttachmentPath
-FROM 		FileAttachments,UnitFileAttachments
+FROM 		FileAttachments with (nolock),UnitFileAttachments with (nolock)
 WHERE  		FileAttachments.AttachmentNum = UnitFileAttachments.AttachmentNum),
  v as
 (SELECT   	u.UnitId					as UnitId,
@@ -37,18 +37,18 @@ WHERE  		FileAttachments.AttachmentNum = UnitFileAttachments.AttachmentNum),
 			heb.UnitText2 				as HeUnitText2,
 			eng.UnitText1 				as EnUnitText1,
 			eng.UnitText2 				as EnUnitText2,
-			STUFF(( SELECT cast(ul.LexiconId as varchar(max)) + ',' FROM dbo.UnitsLexicon ul where ul.UnitId=u.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') UserLexicon,
-			STUFF(( SELECT cast(ufl.AttachmentFileName as nvarchar(max)) + ',' FROM unitFileAttac ufl where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentFileName,
-			STUFF(( SELECT cast(ufl.AttachmentPath as nvarchar(max)) + ',' FROM unitFileAttac ufl where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentPath,
-			STUFF(( SELECT cast(ufl.AttachmentNum as nvarchar(max)) + ',' FROM unitFileAttac ufl where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentNum
+			STUFF(( SELECT cast(ul.LexiconId as varchar(max)) + ',' FROM dbo.UnitsLexicon ul with (nolock) where ul.UnitId=u.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') UserLexicon,
+			STUFF(( SELECT cast(ufl.AttachmentFileName as nvarchar(max)) + ',' FROM unitFileAttac ufl with (nolock) where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentFileName,
+			STUFF(( SELECT cast(ufl.AttachmentPath as nvarchar(max)) + ',' FROM unitFileAttac ufl with (nolock) where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentPath,
+			STUFF(( SELECT cast(ufl.AttachmentNum as nvarchar(max)) + ',' FROM unitFileAttac ufl with (nolock) where ufl.UnitId=u.UnitId order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentNum
 --dbo.PlaceTypesData.PlaceTypeDesc,dbo.Places.PlaceTypeCode,
-FROM        dbo.Units u
-LEFT JOIN	dbo.UnitData heb 			ON u.UnitId = heb.UnitId and heb.LanguageCode=1
-LEFT JOIN	dbo.UnitData eng 			ON u.UnitId = eng.UnitId and eng.LanguageCode=0
-LEFT JOIN 	dbo.RightsTypes rt 			ON u.RightsCode = rt.RightsCode
-LEFT JOIN 	dbo.UnitDisplayStatus uds 	ON u.UnitDisplayStatus = uds.DisplayStatus
-LEFT JOIN 	dbo.UnitStatuses us			ON u.UnitStatus = us.UnitStatus
-LEFT JOIN 	dbo.UnitTypes ut			ON u.UnitType = ut.UnitType
+FROM        dbo.Units u with (nolock)
+LEFT JOIN	dbo.UnitData heb 			with (nolock) ON u.UnitId = heb.UnitId and heb.LanguageCode=1
+LEFT JOIN	dbo.UnitData eng 			with (nolock) ON u.UnitId = eng.UnitId and eng.LanguageCode=0
+LEFT JOIN 	dbo.RightsTypes rt 			with (nolock) ON u.RightsCode = rt.RightsCode
+LEFT JOIN 	dbo.UnitDisplayStatus uds 	with (nolock) ON u.UnitDisplayStatus = uds.DisplayStatus
+LEFT JOIN 	dbo.UnitStatuses us			with (nolock) ON u.UnitStatus = us.UnitStatus
+LEFT JOIN 	dbo.UnitTypes ut			with (nolock) ON u.UnitType = ut.UnitType
 WHERE     u.UnitType = 5)
 SELECT		plcdheb.PlaceTypeDesc 			as HePlaceTypeDesc,
 			plcdeng.PlaceTypeDesc 			as EnPlaceTypeDesc,
@@ -64,11 +64,11 @@ SELECT		plcdheb.PlaceTypeDesc 			as HePlaceTypeDesc,
 			STUFF(( SELECT isnull(cast(P.PicturePath as varchar(max)),'') + ',' FROM dbo.UnitPreviewPics upp left join Pictures P on P.PictureId=upp.PictureId where upp.UnitId=v.UnitId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PrevPicturePaths,
 			STUFF(( SELECT isnull(cast(P.PictureFileName as varchar(max)),'') + ',' FROM dbo.UnitPreviewPics upp left join Pictures P on P.PictureId=upp.PictureId where upp.UnitId=v.UnitId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PrevPictureFileNames
 ,v.*
-FROM  		dbo.Places plc
+FROM  		dbo.Places plc with (nolock)
 JOIN  		v on plc.PlaceId = v.UnitId
-LEFT JOIN 	dbo.PlaceTypesData plcdheb ON plc.PlaceTypeCode = plcdheb.PlaceTypeCode AND 1=plcdheb.LanguageCode
-LEFT JOIN 	dbo.PlaceTypesData plcdeng ON plc.PlaceTypeCode = plcdeng.PlaceTypeCode AND 0=plcdeng.LanguageCode
-LEFT JOIN 	dbo.Places plc_parent ON  plc_parent.PlaceId=plc.PlaceParentId
-LEFT JOIN 	dbo.PlaceTypesData plcd_parentheb ON plc_parent.PlaceTypeCode = plcd_parentheb.PlaceTypeCode AND 1=plcd_parentheb.LanguageCode
-LEFT JOIN 	dbo.PlaceTypesData plcd_parenteng ON plc_parent.PlaceTypeCode = plcd_parenteng.PlaceTypeCode AND 0=plcd_parenteng.LanguageCode
+LEFT JOIN 	dbo.PlaceTypesData plcdheb with (nolock) ON plc.PlaceTypeCode = plcdheb.PlaceTypeCode AND 1=plcdheb.LanguageCode
+LEFT JOIN 	dbo.PlaceTypesData plcdeng with (nolock) ON plc.PlaceTypeCode = plcdeng.PlaceTypeCode AND 0=plcdeng.LanguageCode
+LEFT JOIN 	dbo.Places plc_parent with (nolock) ON  plc_parent.PlaceId=plc.PlaceParentId
+LEFT JOIN 	dbo.PlaceTypesData plcd_parentheb with (nolock) ON plc_parent.PlaceTypeCode = plcd_parentheb.PlaceTypeCode AND 1=plcd_parentheb.LanguageCode
+LEFT JOIN 	dbo.PlaceTypesData plcd_parenteng with (nolock) ON plc_parent.PlaceTypeCode = plcd_parenteng.PlaceTypeCode AND 0=plcd_parenteng.LanguageCode
 ORDER BY 	v.UnitId;
