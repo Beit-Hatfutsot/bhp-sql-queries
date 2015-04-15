@@ -1,8 +1,7 @@
 create table operationsLog (OperationDate datetime,
 							UnitId bigint,
 							OperationDescription varchar(100),
-							IsSynonym bit,
-							IsSynced bit);
+							IsSynonym bit);
 							  
 
 SET ANSI_NULLS ON
@@ -40,8 +39,8 @@ insert Units(OldUnitId, UnitType, RightsCode, UnitStatus, UnitDisplayStatus, IsV
 values(@OldUnitId,@UnitType,@RightsCode,@UnitStatus, @UnitDisplayStatus, dbo.fBHPIsValueUnit(@UnitType,@IsValueUnit), @EditorRemarks, @UpdateUser, @UpdateDate, @ForPreview)
 set @OutParam = @@identity
 
-insert into operationsLog (OperationDate, UnitId, OperationDescription, IsSynonym, IsSynced)
-values (@UpdateDate,@OutParam,'INSERT',0,0);
+insert into operationsLog (OperationDate, UnitId, OperationDescription, IsSynonym,)
+values (@UpdateDate,@OutParam,'INSERT',0);
 
 end try
 begin catch
@@ -89,8 +88,8 @@ set OldUnitId = @OldUnitId
 	,ForPreview = @ForPreview
 where (UnitId = @UnitId)
 
-insert into operationsLog (OperationDate, UnitId, OperationDescription, IsSynonym, IsSynced)
-values (@UpdateDate,@UnitId,'UPDATE',0,0);
+insert into operationsLog (OperationDate, UnitId, OperationDescription, IsSynonym)
+values (@UpdateDate,@UnitId,'UPDATE',0);
 
 
 end try
@@ -158,8 +157,8 @@ delete UnitData where UnitId=@UnitId
 delete Units where UnitId=@UnitId
 and  UnitStatus = 4 and TS = @TimeStamp
 
-insert into operationsLog (OperationDate, UnitId, OperationDescription, IsSynonym, IsSynced) 
-values (@TimeStamp,@UnitId,'DELETE',0,0)
+insert into operationsLog (OperationDate, UnitId, OperationDescription, IsSynonym) 
+values (@TimeStamp,@UnitId,'DELETE',0)
 
 end try
 begin catch
@@ -192,8 +191,8 @@ where (UnitId = @UnitId and TS = @TimeStamp)
 
 select  @@DBTS;
 
-insert into operationsLog (OperationDate, UnitId, OperationDescription, IsSynonym, IsSynced) 
-values (@UpdateDate,@UnitId,'CHANGE_STATUS',0,0)
+insert into operationsLog (OperationDate, UnitId, OperationDescription, IsSynonym) 
+values (@UpdateDate,@UnitId,'CHANGE_STATUS',0)
 
 end try
 begin catch
@@ -206,7 +205,3 @@ SET ANSI_NULLS OFF
 GO
 SET QUOTED_IDENTIFIER OFF
 GO
-
-
-
-
