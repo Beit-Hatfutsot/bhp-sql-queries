@@ -48,10 +48,14 @@ LEFT JOIN dbo.UnitDisplayStatus uds with (nolock) ON u.UnitDisplayStatus = uds.D
 LEFT JOIN dbo.UnitStatuses us with (nolock) ON u.UnitStatus = us.UnitStatus
 LEFT JOIN dbo.UnitTypes ut with (nolock) ON u.UnitType = ut.UnitType
 WHERE     u.UnitType = 4) -- 10376
-select gt.GenTreeNumber, gt.GenTreeFileId,gt.GenTreePath ,
-		gt.GenTreeFileName, gt.GenTreeXmlPath,
-		gtrs.LastUpdate,gtrs.AttemptCount,
-		STUFF(( SELECT cast(us.SourceId as varchar(max)) + ',' FROM dbo.UnitSources us with (nolock) where us.UnitId=v.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,''),
+select	gt.GenTreeNumber, 
+		gt.GenTreeFileId,
+		gt.GenTreePath ,
+		gt.GenTreeFileName, 
+		gt.GenTreeXmlPath,
+		gtrs.LastUpdate,
+		gtrs.AttemptCount,
+		STUFF(( SELECT cast(us.SourceId as varchar(max)) + ',' FROM dbo.UnitSources us with (nolock) where us.UnitId=v.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') SourceIds,
 		v.* 
 FROM v with (nolock)
 JOIN dbo.GenTree gt with (nolock) on  gt.GenTreeId=v.UnitId
