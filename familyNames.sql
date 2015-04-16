@@ -63,7 +63,7 @@ SELECT   	u.UnitId 				as UnitId,
 			STUFF(( SELECT  cast(upp.PictureId as varchar(max)) + ',' 
 					FROM dbo.UnitPreviewPics upp 
 					where upp.UnitId=u.UnitId 
-					order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PictureIds,
+					order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PictureId,
 			-- + Pictures Files Details
 			STUFF(( SELECT isnull(cast(P.PicturePath as varchar(max)),'') + ',' 
 					FROM dbo.UnitPreviewPics upp left join Pictures P on P.PictureId=upp.PictureId 
