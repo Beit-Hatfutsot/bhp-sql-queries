@@ -1,11 +1,10 @@
-create table operationsLog (OperationDate datetime,
-							UnitId bigint,
-							OperationDescription varchar(100),
-							IsSynonym bit);
-							  
+USE [BHP_FINAL]
+GO
 
+/****** Object:  StoredProcedure [dbo].[pBHPInsertUnit]    Script Date: 4/29/2015 4:52:45 PM ******/
 SET ANSI_NULLS ON
 GO
+
 SET QUOTED_IDENTIFIER ON
 GO
 
@@ -39,18 +38,25 @@ insert Units(OldUnitId, UnitType, RightsCode, UnitStatus, UnitDisplayStatus, IsV
 values(@OldUnitId,@UnitType,@RightsCode,@UnitStatus, @UnitDisplayStatus, dbo.fBHPIsValueUnit(@UnitType,@IsValueUnit), @EditorRemarks, @UpdateUser, @UpdateDate, @ForPreview)
 set @OutParam = @@identity
 
-insert into operationsLog (OperationDate, UnitId, OperationDescription, IsSynonym)
-values (@UpdateDate,@OutParam,'INSERT',0);
-
 end try
 begin catch
 	exec iBHPErrorLogInsert
 	exec iBHPErrorRethrow	
 end catch
+
 GO
 
+USE [BHP_FINAL]
+GO
 
-ALTER PROCEDURE [dbo].[pBHPUpdateUnit]
+/****** Object:  StoredProcedure [dbo].[pBHPUpdateUnit]    Script Date: 4/29/2015 4:53:35 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[pBHPUpdateUnit]
 	@UnitId bigint,
 	@OldUnitId [varchar](50),
 	@UnitType [tinyint],
@@ -88,19 +94,27 @@ set OldUnitId = @OldUnitId
 	,ForPreview = @ForPreview
 where (UnitId = @UnitId)
 
-insert into operationsLog (OperationDate, UnitId, OperationDescription, IsSynonym)
-values (@UpdateDate,@UnitId,'UPDATE',0);
-
 
 end try
 begin catch
 	exec iBHPErrorLogInsert
 	exec iBHPErrorRethrow	
 end catch
+
 GO
 
 
-ALTER PROCEDURE [dbo].[pBHPDeleteUnit]
+USE [BHP_FINAL]
+GO
+
+/****** Object:  StoredProcedure [dbo].[pBHPDeleteUnit]    Script Date: 4/29/2015 4:54:14 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[pBHPDeleteUnit]
 	@UnitId int,
 	@TimeStamp timestamp
 WITH EXECUTE AS CALLER
@@ -157,17 +171,26 @@ delete UnitData where UnitId=@UnitId
 delete Units where UnitId=@UnitId
 and  UnitStatus = 4 and TS = @TimeStamp
 
-insert into operationsLog (OperationDate, UnitId, OperationDescription, IsSynonym) 
-values (@TimeStamp,@UnitId,'DELETE',0)
-
 end try
 begin catch
 	exec iBHPErrorLogInsert
 	exec iBHPErrorRethrow	
 end catch
+
 GO
 
-ALTER PROCEDURE [dbo].[pBHPChangeUnitStatus]
+
+USE [BHP_FINAL]
+GO
+
+/****** Object:  StoredProcedure [dbo].[pBHPChangeUnitStatus]    Script Date: 4/29/2015 4:54:56 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[pBHPChangeUnitStatus]
 	@UnitId bigint,
 	@UnitStatus [Int],
 	@UpdateUser nvarchar(30),
@@ -191,17 +214,147 @@ where (UnitId = @UnitId and TS = @TimeStamp)
 
 select  @@DBTS;
 
-insert into operationsLog (OperationDate, UnitId, OperationDescription, IsSynonym) 
-values (@UpdateDate,@UnitId,'CHANGE_STATUS',0)
-
 end try
 begin catch
 	exec iBHPErrorLogInsert
 	exec iBHPErrorRethrow	
 end catch
+
 GO
 
-SET ANSI_NULLS OFF
+-- Synonyms
+USE [BHP_FINAL]
 GO
-SET QUOTED_IDENTIFIER OFF
+
+/****** Object:  StoredProcedure [dbo].[pBHPInsertSynonym]    Script Date: 4/29/2015 4:58:47 PM ******/
+SET ANSI_NULLS ON
 GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[pBHPInsertSynonym]
+(
+	@Synonym nvarchar(100),
+	@LanguageCode int,
+	@Num int -- = Null output
+)
+AS
+	SET NOCOUNT OFF;
+begin try
+if(charindex('$',@Synonym) <> 0)
+	exec iBHPRaisError @ErrorNumber=16	
+
+--if(@Num is null or @Num = -1)
+--	set @Num = (select max(Num) from [Synonyms]) + 1
+
+Insert Synonyms(Num,LanguageCode,[Synonym])
+Values(@Num,@LanguageCode,@Synonym)
+	
+	
+end try
+begin catch
+	exec iBHPErrorLogInsert;
+	exec iBHPErrorRethrow;	
+end catch
+
+GO
+
+
+USE [BHP_FINAL]
+GO
+
+/****** Object:  StoredProcedure [dbo].[pBHPUpdateSynonym]    Script Date: 4/29/2015 4:59:16 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[pBHPUpdateSynonym]
+(
+	@SynonymKey int,
+	@Num int,
+	@LanguageCode int,
+	@Synonym nvarchar(100)
+)
+AS
+	SET NOCOUNT OFF;
+begin try
+Update Synonyms Set [Synonym] = @Synonym, LanguageCode = @LanguageCode
+where Num = @Num AND SynonymKey = @SynonymKey
+end try
+begin catch
+	exec iBHPErrorLogInsert;
+	exec iBHPErrorRethrow;	
+end catch
+
+
+--select US1.[Synonym] as SynonymKey,dbo.fbhpGeneralConcatenates(US2.[Synonym]) as SynonymValues 
+--FROM Synonyms US1,Synonyms US2 
+--WHERE 
+--US1.[Synonym] IN (select Data from dbo.fbhpSplit('Cohen','$'))
+--and
+--US1.Num=US2.Num
+--GROUP BY US1.[Synonym]
+
+GO
+
+
+USE [BHP_FINAL]
+GO
+
+/****** Object:  StoredProcedure [dbo].[pBHPDeleteSynonym]    Script Date: 4/29/2015 4:59:41 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[pBHPDeleteSynonym]
+(
+	@Num int,
+	@Synonym nvarchar(100)
+)
+AS
+	SET NOCOUNT OFF;
+begin try
+delete Synonyms
+where Num = @Num and [Synonym] = @Synonym
+end try
+begin catch
+	exec iBHPErrorLogInsert;
+	exec iBHPErrorRethrow;	
+end catch
+
+GO
+
+
+USE [BHP_FINAL]
+GO
+
+/****** Object:  StoredProcedure [dbo].[pBHPDeleteSynonymUnit]    Script Date: 4/29/2015 4:59:55 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[pBHPDeleteSynonymUnit]
+(
+	@Num int
+)
+AS
+	SET NOCOUNT OFF;
+begin try
+delete Synonyms
+where Num = @Num
+end try
+begin catch
+	exec iBHPErrorLogInsert;
+	exec iBHPErrorRethrow;	
+end catch
+
+GO
+
+
