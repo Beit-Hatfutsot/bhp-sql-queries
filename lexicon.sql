@@ -27,7 +27,7 @@ v as
 		LEFT JOIN dbo.UnitDisplayStatus with (nolock) ON u.UnitDisplayStatus = dbo.UnitDisplayStatus.DisplayStatus 
 		LEFT JOIN dbo.UnitStatuses with (nolock) ON u.UnitStatus = dbo.UnitStatuses.UnitStatus 
 		LEFT JOIN dbo.UnitTypes with (nolock) ON u.UnitType = dbo.UnitTypes.UnitType  
-		WHERE u.UnitType = 10)
+		WHERE u.UnitType = 10 AND (%s=0 OR u.UnitId IN (%s)))
 		SELECT v.*, 
 			STUFF(( SELECT cast(upp.IsPreview as varchar(1)) + ',' FROM dbo.UnitPreviewPics upp with (nolock) where upp.UnitId=v.UnitId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') IsPreview, 
 			STUFF(( SELECT cast(upp.PictureId as varchar(max)) + ',' FROM dbo.UnitPreviewPics upp with (nolock) where upp.UnitId=v.UnitId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PictureId

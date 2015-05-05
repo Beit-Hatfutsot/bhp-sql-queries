@@ -80,4 +80,4 @@ LEFT JOIN 	dbo.RightsTypes rt ON u.RightsCode = rt.RightsCode
 LEFT JOIN 	dbo.UnitDisplayStatus uds ON u.UnitDisplayStatus = uds.DisplayStatus
 LEFT JOIN 	dbo.UnitStatuses uts ON u.UnitStatus = uts.UnitStatus
 LEFT JOIN 	dbo.UnitTypes ut ON u.UnitType = ut.UnitType
-WHERE     	u.UnitType = 6;
+WHERE     	u.UnitType = 6 AND (%s=0 OR u.UnitId IN (%s));

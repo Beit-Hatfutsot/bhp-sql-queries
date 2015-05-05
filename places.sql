@@ -49,7 +49,7 @@ LEFT JOIN 	dbo.RightsTypes rt 			with (nolock) ON u.RightsCode = rt.RightsCode
 LEFT JOIN 	dbo.UnitDisplayStatus uds 	with (nolock) ON u.UnitDisplayStatus = uds.DisplayStatus
 LEFT JOIN 	dbo.UnitStatuses us			with (nolock) ON u.UnitStatus = us.UnitStatus
 LEFT JOIN 	dbo.UnitTypes ut			with (nolock) ON u.UnitType = ut.UnitType
-WHERE     u.UnitType = 5)
+WHERE     u.UnitType = 5 AND (%s=0 OR u.UnitId IN (%s)))
 SELECT		plcdheb.PlaceTypeDesc 			as HePlaceTypeDesc,
 			plcdeng.PlaceTypeDesc 			as EnPlaceTypeDesc,
 			plc.PlaceTypeCode     			as PlaceTypeCode,

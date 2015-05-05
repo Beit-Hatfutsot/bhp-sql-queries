@@ -34,7 +34,7 @@ LEFT JOIN 	dbo.RightsTypes with (nolock) ON u.RightsCode = dbo.RightsTypes.Right
 LEFT JOIN 	dbo.UnitDisplayStatus with (nolock) ON u.UnitDisplayStatus = dbo.UnitDisplayStatus.DisplayStatus
 LEFT JOIN 	dbo.UnitStatuses with (nolock) ON u.UnitStatus = dbo.UnitStatuses.UnitStatus
 LEFT JOIN 	dbo.UnitTypes with (nolock) ON u.UnitType = dbo.UnitTypes.UnitType 
-WHERE     	u.UnitType =8)
+WHERE     	u.UnitType =8 AND (%s=0 OR u.UnitId IN (%s)))
 SELECT   v.*,
 		STUFF(( SELECT cast(ppt.PersonTypeCode as varchar(max)) + ',' FROM dbo.PersonalitiesPersonTypes ppt with (nolock) where ppt.PersonalityId=v.UnitId order by PersonTypeId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PersonTypeCodes,
 		STUFF(( SELECT cast(pt.PersonTypeDesc as varchar(max)) + ',' FROM dbo.PersonalitiesPersonTypes ppt with (nolock), PersonTypesData pt with (nolock) where pt.PersonTypeCode=ppt.PersonTypeCode and ppt.PersonalityId=v.UnitId and pt.LanguageCode=0 for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') HePersonTypeCodesDesc,

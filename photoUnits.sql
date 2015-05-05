@@ -46,7 +46,7 @@ LEFT JOIN dbo.RightsTypes rt with (nolock) ON u.RightsCode = rt.RightsCode
 LEFT JOIN dbo.UnitDisplayStatus uds with (nolock) ON u.UnitDisplayStatus = uds.DisplayStatus
 LEFT JOIN dbo.UnitStatuses us with (nolock) ON u.UnitStatus = us.UnitStatus
 LEFT JOIN dbo.UnitTypes ut with (nolock) ON u.UnitType = ut.UnitType
-WHERE     u.UnitType =1)
+WHERE     u.UnitType =1 AND (%s=0 OR u.UnitId IN (%s)))
 SELECT  pic.*,
 		--UnitSources
 		STUFF(( SELECT cast(us.SourceId as varchar(max)) + ',' FROM dbo.UnitSources us with (nolock) where us.UnitId=pic.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PictureSources,
