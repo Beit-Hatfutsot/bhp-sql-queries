@@ -1,28 +1,17 @@
--- INSERT
+-- INSERT/UPDATE
 select	operationslog.operationDate, 
-		operationslog.UnitId,
-		isnull(Units.UnitType, 15)
-from operationslog.UnitId
-left join Units on operationslog.UnitId=Units.UnitId and operationslog.IsSynonym=0
-where OperationDescription='INSERT'
-and operationslog
-and (IsSynonym=0 or UnitId not in (select UnitId from operationslog where IsSynonym=1 and OperationDescription='DELETE'))
-and operationDate >= from_date
-and operationDate <= to_date
-
--- UPDATE
-select	Oplog.operationDate, 
-		Oplog.UnitId,
-		isnull(Units.UnitType, 15) UnitType
-from (select *,row_number() over(partition by UnitId order by operationDate desc) OperationNum
-      from   operationslog
-	  where OperationDescription in ('UPDATE','CHANGE_STATUS')
-	 /* and operationDate >= from_date
-	  and operationDate <= to_date*/
-	  and (IsSynonym=0 or 
-			UnitId not in (select UnitId from operationslog where IsSynonym=1 and OperationDescription='DELETE'))) Oplog
-left join Units on (Oplog.UnitId=Units.UnitId and Oplog.IsSynonym=0)
-where Oplog.OperationNum=1
+		operationslog.UnitId
+from operationslog
+left join Units 
+on operationslog.UnitId=Units.UnitId and operationslog.IsSynonym=0
+where (IsSynonym=0 or operationslog.UnitId not in 
+(select UnitId 
+from    operationslog 
+where   IsSynonym=1 and OperationDescription='DELETE'))
+and (case OperationDescription when 'CHANGE_STATUS' then 'UPDATE' else OperationDescription end)=operation_type
+and operationDate >= dateadd(s, from_date, '19700101')
+and operationDate <= dateadd(s, to_date, '19700101')
+and isnull(Units.UnitType, 0)=unit_type
 
 -- DELETE
 select	operationslog.operationDate, 
