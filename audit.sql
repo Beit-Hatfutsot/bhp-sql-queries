@@ -1,4 +1,4 @@
-select	operationslog.operationDate, 
+select	max(operationslog.operationDate) as lastOparationDate, 
 		operationslog.UnitId
 from operationslog
 left join Units 
@@ -11,3 +11,4 @@ and (case OperationDescription when 'CHANGE_STATUS' then 'UPDATE' else Operation
 and operationDate >= dateadd(s, %s, '19700101')
 and operationDate <= dateadd(s, %s, '19700101')
 and isnull(Units.UnitType, 0)=%s
+group by operationslog.UnitId
