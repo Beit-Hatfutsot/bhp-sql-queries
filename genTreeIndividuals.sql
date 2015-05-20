@@ -42,4 +42,4 @@ left join   (select 	GenTreeId,
 on 	gti.GenTreeId=Birth.GenTreeId and gti.IndividualId=Birth.IndividualId and Birth.PeriodTypeCode= 1 and Birth.indrank=1
 left join  (select GenTreeId,IndividualId,PeriodTypeCode,PeriodStartDate, PeriodEndDate, row_number() over (partition by GenTreeId,IndividualId order by PeriodStartDate desc) as indrank from [dbo].[GenTreePeriod] with (nolock)) Death
 on gti.GenTreeId=Death.GenTreeId and gti.IndividualId=Death.IndividualId and Death.PeriodTypeCode= 2 and Death.indrank=1
-where gt.GenTreeNumber=gt.GenTreeNumber and (%s=0 OR gt.GenTreeNumber IN (%s))
+where gt.GenTreeId=gt.GenTreeId and (%s=0 OR gt.GenTreeId IN (%s))
