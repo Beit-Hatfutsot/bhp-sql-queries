@@ -21,6 +21,8 @@
 			gt.GenTreePath as GenTreePath, 
 			gt.GenTreeXmlPath as GTXML, 
 			gt.GenTreeFileName AS GTFN,
+			/*Editor Remarks*/
+			units.EditorRemarks,
 			/*Birth Date*/
 			Birth.PeriodStartDate AS BSD,
 			Birth.PeriodEndDate AS BED,
@@ -42,4 +44,5 @@ left join   (select 	GenTreeId,
 on 	gti.GenTreeId=Birth.GenTreeId and gti.IndividualId=Birth.IndividualId and Birth.PeriodTypeCode= 1 and Birth.indrank=1
 left join  (select GenTreeId,IndividualId,PeriodTypeCode,PeriodStartDate, PeriodEndDate, row_number() over (partition by GenTreeId,IndividualId order by PeriodStartDate desc) as indrank from [dbo].[GenTreePeriod] with (nolock)) Death
 on gti.GenTreeId=Death.GenTreeId and gti.IndividualId=Death.IndividualId and Death.PeriodTypeCode= 2 and Death.indrank=1
+left join Units as units on gt.GenTreeId=Units.UnitId
 where gt.GenTreeId=gt.GenTreeId and (%s=0 OR gt.GenTreeId IN (%s))
