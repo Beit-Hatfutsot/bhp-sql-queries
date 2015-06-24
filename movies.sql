@@ -99,7 +99,7 @@ select  /*dbo.Movie.MovieId,*/
 		--UnitPreviewPics
 		STUFF(( SELECT cast(dbo.PicturesUnitPics.PictureUnitId as varchar(max)) + ',' FROM dbo.UnitPreviewPics upp with (nolock) JOIN dbo.PicturesUnitPics with (nolock) ON upp.PictureId = dbo.PicturesUnitPics.PictureId AND upp.UnitId <> dbo.PicturesUnitPics.PictureUnitId and upp.UnitId =m.MovieId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PictureUnitsIds,
 		STUFF(( SELECT cast(upp.IsPreview as varchar(1)) + ',' FROM dbo.UnitPreviewPics upp with (nolock) where upp.UnitId=m.MovieId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') IsPreview,
-		STUFF(( SELECT cast(upp.PictureId as varchar(max)) + ',' FROM dbo.UnitPreviewPics upp with (nolock) where upp.UnitId=m.MovieId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PrevPictureIds,
+		STUFF(( SELECT cast(upp.PictureId as varchar(max)) + ',' FROM dbo.UnitPreviewPics upp with (nolock) where upp.UnitId=m.MovieId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PictureId,
 		-- + Pictures Files Details
 		STUFF(( SELECT isnull(cast(P.PicturePath as varchar(max)),'') + ',' FROM dbo.UnitPreviewPics upp with (nolock) left join Pictures P on P.PictureId=upp.PictureId where upp.UnitId=m.MovieId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PrevPicturePaths,
 		STUFF(( SELECT isnull(cast(P.PictureFileName as varchar(max)),'') + ',' FROM dbo.UnitPreviewPics upp with (nolock) left join Pictures P with (nolock) on P.PictureId=upp.PictureId where upp.UnitId=m.MovieId order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PrevPictureFileNames
