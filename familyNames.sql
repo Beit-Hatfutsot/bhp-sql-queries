@@ -37,38 +37,38 @@ SELECT   	u.UnitId 				as UnitId,
 			heb.UnitText2 			as HeUnitText2,
 			eng.UnitText1 			as EnUnitText1,
 			eng.UnitText2 			as EnUnitText2,
-			STUFF(( SELECT cast(ul.LexiconId as varchar(max)) + ',' 
+			STUFF(( SELECT cast(ul.LexiconId as varchar(max)) + '|' 
 					FROM dbo.UnitsLexicon ul 
 					where ul.UnitId=u.UnitId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') 	UserLexicon,
-			STUFF(( SELECT cast(ufl.AttachmentFileName as nvarchar(max)) + ','
+			STUFF(( SELECT cast(ufl.AttachmentFileName as nvarchar(max)) + '|'
 					FROM unitFileAttac ufl 
 					where ufl.UnitId=u.UnitId 
 					order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentFileName,
-			STUFF(( SELECT cast(ufl.AttachmentPath as nvarchar(max)) + ','
+			STUFF(( SELECT cast(ufl.AttachmentPath as nvarchar(max)) + '|'
 					FROM unitFileAttac ufl 
 					where ufl.UnitId=u.UnitId 
 					order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentPath,
-			STUFF(( SELECT cast(ufl.AttachmentNum as nvarchar(max)) + ',' 
+			STUFF(( SELECT cast(ufl.AttachmentNum as nvarchar(max)) + '|' 
 					FROM unitFileAttac ufl 
 					where ufl.UnitId=u.UnitId 
 					order by ufl.AttachmentNum for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AttachmentNum,
-			STUFF(( SELECT cast(dbo.PicturesUnitPics.PictureUnitId as varchar(max)) + ',' 
+			STUFF(( SELECT cast(dbo.PicturesUnitPics.PictureUnitId as varchar(max)) + '|' 
 					FROM dbo.UnitPreviewPics upp 
 					JOIN dbo.PicturesUnitPics ON upp.PictureId = dbo.PicturesUnitPics.PictureId AND upp.UnitId <> dbo.PicturesUnitPics.PictureUnitId and upp.UnitId =u.UnitId 
 					order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PictureUnitsIds,
-			STUFF(( SELECT  cast(upp.IsPreview as varchar(1)) + ',' 
+			STUFF(( SELECT  cast(upp.IsPreview as varchar(1)) + '|' 
 					FROM dbo.UnitPreviewPics upp 
 					where upp.UnitId=u.UnitId 
 					order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') IsPreview,
-			STUFF(( SELECT  cast(upp.PictureId as varchar(max)) + ',' 
+			STUFF(( SELECT  cast(upp.PictureId as varchar(max)) + '|' 
 					FROM dbo.UnitPreviewPics upp 
 					where upp.UnitId=u.UnitId 
 					order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PictureId,
 			-- + Pictures Files Details
-			STUFF(( SELECT isnull(cast(P.PicturePath as varchar(max)),'') + ',' 
+			STUFF(( SELECT isnull(cast(P.PicturePath as varchar(max)),'') + '|' 
 					FROM dbo.UnitPreviewPics upp left join Pictures P on P.PictureId=upp.PictureId 
 					where upp.UnitId=u.UnitId  order by upp.PictureId for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') PrevPicturePaths,
-			STUFF(( SELECT isnull(cast(P.PictureFileName as varchar(max)),'') + ',' 
+			STUFF(( SELECT isnull(cast(P.PictureFileName as varchar(max)),'') + '|' 
 					FROM dbo.UnitPreviewPics upp 
 					left join Pictures P on P.PictureId=upp.PictureId 
 					where upp.UnitId=u.UnitId
