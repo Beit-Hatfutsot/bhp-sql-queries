@@ -30,8 +30,8 @@
 			Death.PeriodStartDate AS DSD,
 			Death.PeriodEndDate AS DED,
 			/*Marriage Date*/
-			STUFF(( SELECT  cast(Marriage.PeriodStartDate as varchar(100)) + ',' FROM dbo.GenTreePeriod Marriage where gti.GenTreeId=Marriage.GenTreeId and gti.IndividualId=Marriage.IndividualId and Marriage.PeriodTypeCode= 7 order by Marriage.PeriodStartDate for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AS MSD,
-			STUFF(( SELECT  cast(Marriage.PeriodEndDate as varchar(100)) + ',' FROM dbo.GenTreePeriod Marriage where gti.GenTreeId=Marriage.GenTreeId and gti.IndividualId=Marriage.IndividualId and Marriage.PeriodTypeCode= 7 order by Marriage.PeriodStartDate for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AS MED
+			STUFF(( SELECT  cast(Marriage.PeriodStartDate as varchar(100)) + '|' FROM dbo.GenTreePeriod Marriage where gti.GenTreeId=Marriage.GenTreeId and gti.IndividualId=Marriage.IndividualId and Marriage.PeriodTypeCode= 7 order by Marriage.PeriodStartDate for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AS MSD,
+			STUFF(( SELECT  cast(Marriage.PeriodEndDate as varchar(100)) + '|' FROM dbo.GenTreePeriod Marriage where gti.GenTreeId=Marriage.GenTreeId and gti.IndividualId=Marriage.IndividualId and Marriage.PeriodTypeCode= 7 order by Marriage.PeriodStartDate for XML PATH(''),Type).value('.','NVARCHAR(MAX)'),1,0,'') AS MED
 from 		[dbo].[GenTreeIndividuals] gti with (nolock)
 full join 	[dbo].[GenTree] gt with (nolock) on gt.GenTreeId=gti.GenTreeId
 left join   (select 	GenTreeId,
